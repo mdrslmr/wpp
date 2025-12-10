@@ -1,0 +1,29 @@
+cabal-version:      3.4
+name:               wooden-puzzle-parallel
+version:            0.1.0.0
+synopsis:           Running the woodn puzzle parallel
+license:            GPL-3.0-only
+license-file:       LICENSE
+author:             Michael Dressel
+maintainer:         michael.dressel@kloenplatz.de
+category:           Game
+build-type:         Simple
+extra-doc-files:    README.md
+
+common configs
+    build-depends:      base , linear , time, regex-tdfa 
+    ghc-options:        -Wall -threaded -with-rtsopts=-N
+    build-depends:    base ^>=4.18.3.0
+    other-modules: WPmodule
+    hs-source-dirs:   src/
+    default-language: Haskell2010
+
+
+executable wooden-puzzle-parallel
+    import:           configs
+    main-is:          wooden_puzzle_parallel.hs
+
+executable comp
+    import:           configs
+    main-is:          compWoodenPuzzle.hs
+
