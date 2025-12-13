@@ -1,8 +1,8 @@
 {-
- - This code has been (mostly) extracted 
- - from https://glocq.github.io/en/blog/20250428/
+ - This code has been extracted from:
+ - https://glocq.github.io/en/blog/20250428/
  - written by Grégoire Locqueville.
- -
+ - Some small refactoring has been made.
 -}
 
 

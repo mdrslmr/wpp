@@ -42,10 +42,12 @@ it looks like this exclusion actually slowed down finding them.
 
 The analysis produced by running `cbal run comp` using the result in `data` 
 shows:
-    orig length 1898  -- (number of solutions)
-    nub length 1898   -- (number of solutions with duplicates removed)
-    twins found: 1754 -- (number of pieces side by side)
-    btb found: 1829   -- (number of pieces back to back)
+```
+orig length 1898  -- (number of solutions)
+nub length 1898   -- (number of solutions with duplicates removed)
+twins found: 1754 -- (number of pieces side by side)
+btb found: 1829   -- (number of pieces back to back)
+```
 
 Since the orig length and the "nub" (duplicate removed) length are
 identical, there are no identical solutions that are just printed
@@ -55,7 +57,7 @@ There are very many twins and btb in the solutions, so my first
 attempt, that unfortunately succeeded by chance, was a typical
 "N=1" study.
 
-# Parallel
+## Parallel
 Grégoirei's function `pickFreeVoxel` starts in the corner (1 1 1).
 There are 12 pieces that can be placed in this corner. For running
 parallel these 12 pieces are extracted from the candidates pieces
@@ -63,6 +65,7 @@ and for each one of them a thread is created running with one of these
 12 pieces and the remaining candidates, not containing any piece
 that contains the voxel (1 1 1). This way twelve threads are run
 in parallel. By chance my laptop has twelve cores, allowing
-to run the threads simultaneously (not just by time sharing).
+to run the threads simultaneously
+(not just by splitting time between thread).
 
 
