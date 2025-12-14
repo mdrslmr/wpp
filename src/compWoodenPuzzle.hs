@@ -79,28 +79,30 @@ compSols f (a:as) = rotcomp (sort (map (rotShape f) a)) as : compSols f as
 mRot :: M33 Int -> V3 Int -> V3 Int
 mRot m v = V3 3 3 3 + m !* (v - V3 3 3 3)
 
-printRots :: [M33 Int] -> [[Shape]] -> IO ()
-printRots [] _ = return ()
-printRots (m:ms) solutions = do
+printRots :: [M33 Int] -> [[Shape]] -> Int -> IO ()
+printRots [] _ t = do putStrLn  $ "total symmetric images: " <> show t
+printRots (m:ms) solutions t = do
     let sols = compSols (mRot m) solutions
     putStrLn ""
     print m
-    print (sum sols)
+    let ti = sum sols
+    print ti
     print sols
-    printRots ms solutions
+    printRots ms solutions (t+ti)
 
 
 main :: IO ()
 main = do
     content <- readFile "data/wp-inf.txt"
-    --content <- readFile "wp-200-test.txt"
     let solutions = solsFromContent content
     
+    putStrLn "all orthos:"
+    printRots allOrthos solutions 0
+    putStrLn $ "    found in " <> show (length allOrthos) <>
+                                            " othonormal transformations"
     putStrLn $ "orig length " <> show (length solutions)
     putStrLn $ "nub length " <> show (length $ nub (map sort solutions))
     putStrLn $ "twins found: " <> show ( length $ twins solutions 1)
     putStrLn $ "btb found: " <> show ( length $ btb solutions 1)
 
-    putStrLn "all orthos"
-    printRots allOrthos solutions
 
