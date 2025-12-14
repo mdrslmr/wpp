@@ -43,10 +43,13 @@ it looks like this exclusion actually slowed down finding them.
 The analysis produced by running `cbal run comp` using the result in `data` 
 shows:
 ```
+total symmetric images: 1307
+    found in 48 orthonormal transformations
 orig length 1898  -- (number of solutions)
-nub length 1898   -- (number of solutions with duplicates removed)
+nub length 1898   -- (solutions with duplicates, in listing order, removed)
 twins found: 1754 -- (number of pieces side by side)
 btb found: 1829   -- (number of pieces back to back)
+number of unique solutions: 1016 -- (removed orthonormal transformations)
 ```
 
 Since the orig length and the "nub" (duplicate removed) length are

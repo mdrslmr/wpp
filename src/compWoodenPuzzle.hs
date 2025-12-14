@@ -90,6 +90,25 @@ printRots (m:ms) solutions t = do
     print sols
     printRots ms solutions (t+ti)
 
+nonDoublets :: [Shape] -> [[Shape]] -> [[Shape]]
+nonDoublets _ [] = []
+nonDoublets c (a:as) | doublet c a = rest
+                     | otherwise = a : rest
+    where doublet :: [Shape] -> [Shape] -> Bool
+          doublet x y |  x == sort y  = True
+                      |     otherwise = False
+          rest = nonDoublets c as
+
+nonSimilars :: (V3 Int -> V3 Int) -> [[Shape]] -> [[Shape]]
+nonSimilars _ [] = []
+nonSimilars f (a:as) = a : nonSimilars f
+                        (nonDoublets (sort (map (rotShape f) a)) as)
+
+
+findUnique :: [M33 Int] -> [[Shape]] -> [[Shape]]
+findUnique [] us = us
+findUnique (m:ms) solutions = 
+    findUnique ms (nonSimilars (mRot m) solutions)
 
 main :: IO ()
 main = do
@@ -104,5 +123,8 @@ main = do
     putStrLn $ "nub length " <> show (length $ nub (map sort solutions))
     putStrLn $ "twins found: " <> show ( length $ twins solutions 1)
     putStrLn $ "btb found: " <> show ( length $ btb solutions 1)
+    let unique = findUnique allOrthos solutions
+    putStrLn $ "number of unique solutions: " <> show (length unique)
+
 
 
