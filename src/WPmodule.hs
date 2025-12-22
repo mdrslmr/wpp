@@ -78,9 +78,6 @@ allValidPieces :: [[V3 Int]]
 allValidPieces = fmap dispositionCoordinates allValidDispositions
 
 
-conflict :: Shape -> Shape -> Bool
-conflict occs piece = any (`elem` piece) occs
-
 pickFreeVoxel :: Shape -> V3 Int
 pickFreeVoxel alreadyOccupiedVoxels =
   head $
@@ -95,9 +92,7 @@ subsolutionsSmart _ 0 _ = [[]]
 subsolutionsSmart as n occupiedVoxels = do
   let freeVoxel = pickFreeVoxel occupiedVoxels
   newPiece <- filter
-                  (\piece -> elem freeVoxel piece &&
-                             not (conflict occupiedVoxels piece)
-                  )
+                  (\piece -> elem freeVoxel piece)
                   as
 
   let updatedOccupiedVoxels = newPiece <> occupiedVoxels
