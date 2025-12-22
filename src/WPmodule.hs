@@ -77,33 +77,28 @@ allValidDispositions = filter isValidDisposition candidateDispositions
 allValidPieces :: [[V3 Int]]
 allValidPieces = fmap dispositionCoordinates allValidDispositions
 
-
-pickFreeVoxel :: Shape -> V3 Int
-pickFreeVoxel alreadyOccupiedVoxels =
-  head $
-  filter (`notElem` alreadyOccupiedVoxels)
-  [V3 x y z | x <- [5,4,3,2,1], y <- [5,4,3,2,1], z <- [5,4,3,2,1]]
+emptyBox :: Shape
+emptyBox = [V3 x y z | x <- [5,4,3,2,1], y <- [5,4,3,2,1], z <- [5,4,3,2,1]]
 
 subsolutionsSmart :: [Shape] -- candidates
                   -> Int   -- ^ How many pieces should be in the subsolution we're looking for?
-                  -> Shape -- ^ Unavailable voxels, already occupied by some piece
+                  -> Shape -- ^ box
                   -> [[Shape]]
 subsolutionsSmart _ 0 _ = [[]]
-subsolutionsSmart as n occupiedVoxels = do
-  let freeVoxel = pickFreeVoxel occupiedVoxels
+subsolutionsSmart _ _ [] = [[]]
+subsolutionsSmart as n (freeVoxel:box) = do
   newPiece <- filter
                   (\piece -> elem freeVoxel piece)
                   as
 
-  let updatedOccupiedVoxels = newPiece <> occupiedVoxels
-
   -- remove pieces having voxels in common with the newPiece
   -- the idea is taken from Knuth's Algorithm X
   let as' = filter (\piece -> (not (any (`elem` newPiece) piece)) )  as
+  let box' = filter (`notElem` newPiece) box
 
-  otherPieces <- subsolutionsSmart as' (n - 1) updatedOccupiedVoxels
+  otherPieces <- subsolutionsSmart as' (n - 1) box'
   return $ newPiece : otherPieces
 
 allSolutionsSmart :: [Shape] -> [[Shape]]
-allSolutionsSmart as = subsolutionsSmart as 25 []
+allSolutionsSmart as = subsolutionsSmart as 25 emptyBox
 
