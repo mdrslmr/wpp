@@ -48,7 +48,7 @@ candidateRotations = [
   , m31 <- [-1..1], m32 <- [-1..1], m33 <- [-1..1]
   ]
 candidateTranslations :: [V3 Int]
-candidateTranslations = [ V3 x y z | x <- [1..5], y <- [1..5], z <- [1..5] ]
+candidateTranslations = [ V3 x y z | x <- [5,4,3,2,1], y <- [5,4,3,2,1], z <- [5,4,3,2,1] ]
 
 candidateDispositions :: [Disposition]
 candidateDispositions =
@@ -85,7 +85,7 @@ pickFreeVoxel :: Shape -> V3 Int
 pickFreeVoxel alreadyOccupiedVoxels =
   head $
   filter (`notElem` alreadyOccupiedVoxels)
-  [V3 x y z | x <- [1..5], y <- [1..5], z <- [1..5]]
+  [V3 x y z | x <- [5,4,3,2,1], y <- [5,4,3,2,1], z <- [5,4,3,2,1]]
 
 subsolutionsSmart :: [Shape] -- candidates
                   -> Int   -- ^ How many pieces should be in the subsolution we're looking for?

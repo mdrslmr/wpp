@@ -112,18 +112,23 @@ findUnique (m:ms) solutions =
 
 main :: IO ()
 main = do
-    content <- readFile "data/wp-inf.txt"
+    --content <- readFile "data/wp-inf.txt"
+    --content <- readFile "data/wp-test.txt"
+    content <- getContents
     let solutions = solsFromContent content
+    let nubsols = nub (map sort solutions)
     
     putStrLn "all orthos:"
-    printRots allOrthos solutions 0
+{-
+    printRots allOrthos nubsols 0
     putStrLn $ "    found in " <> show (length allOrthos) <>
                                             " othonormal transformations"
+-}
     putStrLn $ "orig length " <> show (length solutions)
-    putStrLn $ "nub length " <> show (length $ nub (map sort solutions))
-    putStrLn $ "twins found: " <> show ( length $ twins solutions 1)
-    putStrLn $ "btb found: " <> show ( length $ btb solutions 1)
-    let unique = findUnique allOrthos solutions
+    putStrLn $ "nub length " <> show (length nubsols)
+    putStrLn $ "twins found: " <> show ( length $ twins nubsols 1)
+    putStrLn $ "btb found: " <> show ( length $ btb nubsols 1)
+    let unique = findUnique allOrthos nubsols
     putStrLn $ "number of unique solutions: " <> show (length unique)
 
 

@@ -60,7 +60,7 @@ printSolutions n startTime (x:xs) mv = do
 
 pickFirsts :: [Shape] -> ([Shape],[Shape]) -> ([Shape],[Shape])
 pickFirsts [] (fs,rs) = (fs,rs)
-pickFirsts (a:as) (fs,rs) | V3 1 1 1 `elem` a = pickFirsts as (a:fs,rs)
+pickFirsts (a:as) (fs,rs) | V3 5 5 5 `elem` a = pickFirsts as (a:fs,rs)
                           | otherwise = pickFirsts as (fs,a:rs)
 
 findAllParallel :: Int ->  ([Shape], [Shape]) -> UTCTime -> MVar Int -> IO ()
