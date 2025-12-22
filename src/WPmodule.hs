@@ -101,7 +101,12 @@ subsolutionsSmart as n occupiedVoxels = do
                   as
 
   let updatedOccupiedVoxels = newPiece <> occupiedVoxels
-  otherPieces <- subsolutionsSmart as (n - 1) updatedOccupiedVoxels
+
+  -- remove pieces having voxels in common with the newPiece
+  -- the idea is taken from Knuth's Algorithm X
+  let as' = filter (\piece -> (not (any (`elem` newPiece) piece)) )  as
+
+  otherPieces <- subsolutionsSmart as' (n - 1) updatedOccupiedVoxels
   return $ newPiece : otherPieces
 
 allSolutionsSmart :: [Shape] -> [[Shape]]
