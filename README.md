@@ -3,6 +3,8 @@
 This software is largely taken from Grégoire Locqueville:
 https://glocq.github.io/en/blog/20250428/
 
+See this thread on mastodon: https://sciences.social/@hn50@social.lansky.name/115239775879997755
+
 ## Source code
 
 `WPmodule.hs` contains the code from the above link , with a few tiny
