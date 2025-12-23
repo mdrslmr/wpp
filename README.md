@@ -10,7 +10,7 @@ See this thread on mastodon: https://sciences.social/@hn50@social.lansky.name/11
 `WPmodule.hs` contains the code from the above link , with a few tiny
 modifications.
 In the last commits some snippets from "Knuths Algorithm X"
-https://en.wikipedia.org/wiki/Knuth's\_Algorithm\_X, already used
+https://en.wikipedia.org/wiki/Knuth%27s_Algorithm_X already used
 by https://rtomas.web.cern.ch/rtomas/Ypentacubes/ have been added.
 I.e.  from the list of candidates (`as`) all pieces having a voxel in common
 with the just retrieved `newPiece` are removed (`as'`) before passing
