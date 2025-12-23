@@ -3,6 +3,8 @@
  - https://glocq.github.io/en/blog/20250428/
  - written by Grégoire Locqueville.
  - Some small refactoring has been made.
+ - The last commits introduce some snippets from "Knuth's Algorithm X",
+ - see README.md.
 -}
 
 
@@ -48,7 +50,7 @@ candidateRotations = [
   , m31 <- [-1..1], m32 <- [-1..1], m33 <- [-1..1]
   ]
 candidateTranslations :: [V3 Int]
-candidateTranslations = [ V3 x y z | x <- [5,4,3,2,1], y <- [5,4,3,2,1], z <- [5,4,3,2,1] ]
+candidateTranslations = [ V3 x y z | x <- [1..5], y <- [1..5], z <- [1..5] ]
 
 candidateDispositions :: [Disposition]
 candidateDispositions =
@@ -78,7 +80,7 @@ allValidPieces :: [[V3 Int]]
 allValidPieces = fmap dispositionCoordinates allValidDispositions
 
 emptyBox :: Shape
-emptyBox = [V3 x y z | x <- [5,4,3,2,1], y <- [5,4,3,2,1], z <- [5,4,3,2,1]]
+emptyBox = [V3 x y z | x <- [1..5], y <- [1..5], z <- [1..5]]
 
 subsolutionsSmart :: [Shape] -- candidates
                   -> Int   -- ^ How many pieces should be in the subsolution we're looking for?
