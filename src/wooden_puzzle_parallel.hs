@@ -4,7 +4,6 @@ import Data.Time.Clock (getCurrentTime, diffUTCTime, UTCTime)
 import Linear.V3 (V3(V3))
 import Data.List (sortBy)
 import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar, threadDelay)
-import Control.Monad (when)
 import WPmodule ( Shape, allSolutionsSmart, allValidPieces )
 
 {-
@@ -41,10 +40,15 @@ formatLines i ((_,s):xs) = show s ++ sep ++ formatLines (i+1) xs
 formatLines _ [] = "\n"
 
 
-printSolutions :: Int -> UTCTime -> [[Shape]] -> MVar Int -> IO ()
-printSolutions _ _ [] _ = return ()
+printSolutions :: Int -> UTCTime -> [[Shape]] -> MVar (Int, Int, Bool)
+                                -> IO ()
+printSolutions n _ [] mv = do
+    (i,t, s) <- takeMVar mv
+    putStrLn $ "Thread " <> show n <> " done." 
+    putMVar mv (i, t-1, s)
+    return ()
 printSolutions n startTime (x:xs) mv = do
-    i <- takeMVar mv
+    (i,t,_) <- takeMVar mv
     endTime <- getCurrentTime
     print x
     putStrLn ""
@@ -53,7 +57,7 @@ printSolutions n startTime (x:xs) mv = do
                 <> show i <> " in " <> show (realToFrac
                 (diffUTCTime endTime startTime) :: Double) <> " seconds."
     putStrLn ""
-    putMVar mv (i+1)
+    putMVar mv (i+1, t,True)
     nextStart <- getCurrentTime
     printSolutions n nextStart xs mv
     
@@ -63,29 +67,36 @@ pickFirsts [] (fs,rs) = (fs,rs)
 pickFirsts (a:as) (fs,rs) | V3 1 1 1 `elem` a = pickFirsts as (a:fs,rs)
                           | otherwise = pickFirsts as (fs,a:rs)
 
-findAllParallel :: Int ->  ([Shape], [Shape]) -> UTCTime -> MVar Int -> IO ()
+findAllParallel :: Int ->  ([Shape], [Shape]) -> UTCTime ->
+                    MVar (Int, Int, Bool) -> IO ()
 findAllParallel _ ([], _) _ _ = return ()
 findAllParallel n (f:fs,as) startTime mv = do
     putStrLn $ "start thread: " <> show n
     _ <- forkIO $ printSolutions n startTime (allSolutionsSmart (f:as)) mv
+    (i,t, started) <- takeMVar mv
+    putMVar mv (i,t+1, started)
     findAllParallel (n+1) (fs,as) startTime mv
 
-waitMvar :: (Int -> Bool) -> MVar Int -> IO ()
+waitMvar :: (Int -> Bool) -> MVar (Int, Int, Bool) -> IO ()
 waitMvar f mv = do
-    i <- takeMVar mv
-    when (f i) $ do
-            putMVar mv i
+    (i,t, started) <- takeMVar mv
+    if  not started || (t>0 && f i) then
+        do
+            putMVar mv (i,t, started)
             threadDelay 10000000
             waitMvar f mv
+    else
+        do
+            putMVar mv (i,t, started)
 
 main :: IO ()
 main = do
     startTime <- getCurrentTime
 
-    mv <- newMVar 1
+    mv <- newMVar (1,0,False)
     findAllParallel 1 (pickFirsts allValidPieces ([],[]))  startTime mv
 
---    waitMvar (<200) mv
+--    waitMvar (<20) mv
     waitMvar (const True) mv
 
     putStrLn "done"
