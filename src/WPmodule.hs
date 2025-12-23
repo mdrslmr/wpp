@@ -89,13 +89,11 @@ subsolutionsSmart :: [Shape] -- candidates
 subsolutionsSmart _ 0 _ = [[]]
 subsolutionsSmart _ _ [] = [[]]
 subsolutionsSmart as n (freeVoxel:box) = do
-  newPiece <- filter
-                  (\piece -> elem freeVoxel piece)
-                  as
+  newPiece <- filter (elem freeVoxel) as
 
   -- remove pieces having voxels in common with the newPiece
   -- the idea is taken from Knuth's Algorithm X
-  let as' = filter (\piece -> (not (any (`elem` newPiece) piece)) )  as
+  let as' = filter (not.any (`elem` newPiece))  as
   let box' = filter (`notElem` newPiece) box
 
   otherPieces <- subsolutionsSmart as' (n - 1) box'
