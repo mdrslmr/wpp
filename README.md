@@ -7,6 +7,14 @@ https://glocq.github.io/en/blog/20250428/
 
 `WPmodule.hs` contains the code from the above link , with a few tiny
 modifications.
+In the last commits some snippets from "Knuths Algorithm X"
+https://en.wikipedia.org/wiki/Knuth's\_Algorithm\_X, already used
+by https://rtomas.web.cern.ch/rtomas/Ypentacubes/ have been added.
+I.e.  from the list of candidates (`as`) all pieces having a voxel in common
+with the just retrieved `newPiece` are removed (`as'`) before passing
+it on to obtain the next subsolution. Accordingly the free voxel used
+in the current step is removed from the list of voxels before
+passing it on to the next step.
 
 `wooden_puzzle_parallel.hs` uses `WPmodule` and adds code for running in
 parallel as well as printing maps (https://github.com/mdrslmr/wooden\_map)
