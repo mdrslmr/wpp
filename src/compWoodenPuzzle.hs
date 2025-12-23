@@ -116,7 +116,8 @@ main = do
     --content <- readFile "data/wp-test.txt"
     content <- getContents
     let solutions = solsFromContent content
-    let nubsols = nub (map sort solutions)
+    let sols25 = filter (\s -> length s == 25) solutions
+    let nubsols = nub (map sort sols25)
     
     putStrLn "all orthos:"
 {-
@@ -124,8 +125,9 @@ main = do
     putStrLn $ "    found in " <> show (length allOrthos) <>
                                             " othonormal transformations"
 -}
-    putStrLn $ "orig length " <> show (length solutions)
-    putStrLn $ "nub length " <> show (length nubsols)
+    putStrLn $ "orig length: " <> show (length solutions)
+    putStrLn $ "solutions with length 25: " <> show (length sols25)
+    putStrLn $ "nub length: " <> show (length nubsols)
     putStrLn $ "twins found: " <> show ( length $ twins nubsols 1)
     putStrLn $ "btb found: " <> show ( length $ btb nubsols 1)
     let unique = findUnique allOrthos nubsols
