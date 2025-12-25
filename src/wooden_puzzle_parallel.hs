@@ -4,8 +4,9 @@ import Data.Time.Clock (getCurrentTime, diffUTCTime, UTCTime)
 import Linear.V3 (V3(V3))
 import Data.List (sortBy)
 import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar)
-import WPmodule ( Shape, allSolutionsSmart, allValidPieces )
+import WPmodule ( Shape, allSolutionsSmart)
 import Control.Monad (when, unless)
+import StaticPieces (staticPieces)
 
 {-
  - Assigning symbols to the pieces parts:
@@ -67,8 +68,7 @@ printSolutions n startTime (x:xs) mv mvTh f = do
         when done' $ putMVar mvTh True
         putMVar mv (i+1, t, done')
         unless done' $ do
-            nextStart <- getCurrentTime
-            printSolutions n nextStart xs mv mvTh f
+            printSolutions n startTime xs mv mvTh f
     
 
 pickFirsts :: [Shape] -> ([Shape],[Shape]) -> ([Shape],[Shape])
@@ -91,8 +91,12 @@ findAllParallel n (f:fs,as) startTime mv mvTh g = do
     putMVar mv (i,t+1, done)
     findAllParallel (n+1) (fs,as) startTime mv mvTh g
 
+
+
+
 main :: IO ()
 main = do
+
     startTime <- getCurrentTime
 
     mv <- newMVar (1,0,False)
@@ -100,7 +104,7 @@ main = do
     _ <- takeMVar mvTh
     findAllParallel 1
             (pickFirsts
-            allValidPieces ([],[]))
+            staticPieces ([],[]))
             startTime
             mv
             mvTh
