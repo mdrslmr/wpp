@@ -12,17 +12,23 @@ extra-doc-files:    README.md
 
 common configs
     build-depends:      base , linear , time, regex-tdfa 
-    ghc-options:        -Wall -threaded -with-rtsopts=-N -O
-    other-modules: WPmodule
+    ghc-options:        -Wall -threaded
     hs-source-dirs:   src/
     default-language: Haskell2010
 
+library
+    import:              configs
+    exposed-modules:     WPmodule
 
 executable wooden-puzzle-parallel
     import:           configs
+    other-modules:    WPmodule
     main-is:          wooden_puzzle_parallel.hs
+    ghc-options:        -Wall -threaded -with-rtsopts=-N
 
 executable comp
     import:           configs
+    other-modules:    WPmodule
     main-is:          compWoodenPuzzle.hs
+    ghc-options:        -Wall -threaded -with-rtsopts=-N
 
