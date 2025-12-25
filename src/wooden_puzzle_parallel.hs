@@ -3,8 +3,9 @@ module Main where
 import Data.Time.Clock (getCurrentTime, diffUTCTime, UTCTime)
 import Linear.V3 (V3(V3))
 import Data.List (sortBy)
-import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar, threadDelay)
+import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar)
 import WPmodule ( Shape, allSolutionsSmart, allValidPieces )
+import Control.Monad (when, unless)
 
 {-
  - Assigning symbols to the pieces parts:
@@ -41,25 +42,33 @@ formatLines _ [] = "\n"
 
 
 printSolutions :: Int -> UTCTime -> [[Shape]] -> MVar (Int, Int, Bool)
+                                -> MVar Bool
+                                -> (Int -> Bool)
                                 -> IO ()
-printSolutions n _ [] mv = do
-    (i,t, s) <- takeMVar mv
+printSolutions n _ [] mv mvTh f = do
+    (i,t, _) <- takeMVar mv
     putStrLn $ "Thread " <> show n <> " done." 
-    putMVar mv (i, t-1, s)
+    let done = t==1 || f i
+    when done  $ putMVar mvTh True
+    putMVar mv (i, t-1, done)
     return ()
-printSolutions n startTime (x:xs) mv = do
-    (i,t,_) <- takeMVar mv
-    endTime <- getCurrentTime
-    print x
-    putStrLn ""
-    putStrLn $ formatMap $ cube x
-    putStrLn $ "Thread " <> show n <> " found solution " 
+printSolutions n startTime (x:xs) mv mvTh f = do
+    (i,t,done) <- takeMVar mv
+    unless done $ do
+        endTime <- getCurrentTime
+        print x
+        putStrLn ""
+        putStrLn $ formatMap $ cube x
+        putStrLn $ "Thread " <> show n <> " found solution " 
                 <> show i <> " in " <> show (realToFrac
                 (diffUTCTime endTime startTime) :: Double) <> " seconds."
-    putStrLn ""
-    putMVar mv (i+1, t,True)
-    nextStart <- getCurrentTime
-    printSolutions n nextStart xs mv
+        putStrLn ""
+        let done' = f i
+        when done' $ putMVar mvTh True
+        putMVar mv (i+1, t, done')
+        unless done' $ do
+            nextStart <- getCurrentTime
+            printSolutions n nextStart xs mv mvTh f
     
 
 pickFirsts :: [Shape] -> ([Shape],[Shape]) -> ([Shape],[Shape])
@@ -68,35 +77,36 @@ pickFirsts (a:as) (fs,rs) | V3 1 1 1 `elem` a = pickFirsts as (a:fs,rs)
                           | otherwise = pickFirsts as (fs,a:rs)
 
 findAllParallel :: Int ->  ([Shape], [Shape]) -> UTCTime ->
-                    MVar (Int, Int, Bool) -> IO ()
-findAllParallel _ ([], _) _ _ = return ()
-findAllParallel n (f:fs,as) startTime mv = do
+                    MVar (Int, Int, Bool) -> MVar Bool -> (Int -> Bool) -> IO ()
+findAllParallel _ ([], _) _ _ _  _ = return ()
+findAllParallel n (f:fs,as) startTime mv mvTh g = do
     putStrLn $ "start thread: " <> show n
-    _ <- forkIO $ printSolutions n startTime (allSolutionsSmart (f:as)) mv
-    (i,t, started) <- takeMVar mv
-    putMVar mv (i,t+1, started)
-    findAllParallel (n+1) (fs,as) startTime mv
-
-waitMvar :: (Int -> Bool) -> MVar (Int, Int, Bool) -> IO ()
-waitMvar f mv = do
-    (i,t, started) <- takeMVar mv
-    if  not started || (t>0 && f i) then
-        do
-            putMVar mv (i,t, started)
-            threadDelay 10000000
-            waitMvar f mv
-    else
-        do
-            putMVar mv (i,t, started)
+    _ <- forkIO $ printSolutions n
+                                 startTime
+                                 (allSolutionsSmart (f:as))
+                                 mv
+                                 mvTh
+                                 g
+    (i,t, done) <- takeMVar mv
+    putMVar mv (i,t+1, done)
+    findAllParallel (n+1) (fs,as) startTime mv mvTh g
 
 main :: IO ()
 main = do
     startTime <- getCurrentTime
 
     mv <- newMVar (1,0,False)
-    findAllParallel 1 (pickFirsts allValidPieces ([],[]))  startTime mv
+    mvTh <- newMVar False
+    _ <- takeMVar mvTh
+    findAllParallel 1
+            (pickFirsts
+            allValidPieces ([],[]))
+            startTime
+            mv
+            mvTh
+            (const False) 
+            -- (>=20) 
 
---    waitMvar (<20) mv
-    waitMvar (const True) mv
+    _ <- takeMVar mvTh
 
     putStrLn "done"
