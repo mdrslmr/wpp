@@ -17,7 +17,6 @@ module WPmodule (
 
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, det33, (!*!), (!*))
-import StaticPieces (staticBox)
 
 type Shape = [V3 Int]
 
@@ -101,5 +100,5 @@ subsolutionsSmart as n (freeVoxel:box) = do
   return $ newPiece : otherPieces
 
 allSolutionsSmart :: [Shape] -> [[Shape]]
-allSolutionsSmart as = subsolutionsSmart as 25 staticBox
+allSolutionsSmart as = subsolutionsSmart as 25 emptyBox
 

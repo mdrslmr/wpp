@@ -6,7 +6,7 @@ import Data.List (sortBy)
 import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar)
 import WPmodule ( Shape, allSolutionsSmart)
 import Control.Monad (when, unless)
-import StaticPieces (staticPieces)
+import StaticPieces (staticPieces2)
 
 {-
  - Assigning symbols to the pieces parts:
@@ -104,7 +104,7 @@ main = do
     _ <- takeMVar mvTh
     findAllParallel 1
             (pickFirsts
-            staticPieces ([],[]))
+            staticPieces2 ([],[]))
             startTime
             mv
             mvTh
