@@ -107,7 +107,7 @@ nonSimilars f (a:as) = a : nonSimilars f
 
 findUnique :: [M33 Int] -> [[Shape]] -> [[Shape]]
 findUnique [] us = us
-findUnique (m:ms) solutions = 
+findUnique (m:ms) solutions =
     findUnique ms (nonSimilars (mRot m) solutions)
 
 main :: IO ()
@@ -118,7 +118,7 @@ main = do
     let solutions = solsFromContent content
     let sols25 = filter (\s -> length s == 25) solutions
     let nubsols = nub (map sort sols25)
-    
+
     putStrLn "all orthos:"
 {-
     printRots allOrthos nubsols 0

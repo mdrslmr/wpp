@@ -12,9 +12,9 @@ module WPmodule (
     Shape,
     candidateRotations,
     allSolutionsSmart,
-    allValidPieces 
+    allValidPieces
 ) where
- 
+
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, det33, (!*!), (!*))
 

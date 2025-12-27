@@ -1,7 +1,7 @@
 module StaticPieces (
     staticPieces
 ) where
- 
+
 import Linear.V3 (V3(V3))
 
 -- static list of allValidPieces sorted

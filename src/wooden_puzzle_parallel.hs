@@ -48,7 +48,7 @@ printSolutions :: Int -> UTCTime -> [[Shape]] -> MVar (Int, Int, Bool)
                                 -> IO ()
 printSolutions n _ [] mv mvTh f = do
     (i,t, _) <- takeMVar mv
-    putStrLn $ "Thread " <> show n <> " done." 
+    putStrLn $ "Thread " <> show n <> " done."
     let done = t==1 || f i
     when done  $ putMVar mvTh True
     putMVar mv (i, t-1, done)
@@ -60,7 +60,7 @@ printSolutions n startTime (x:xs) mv mvTh f = do
         print x
         putStrLn ""
         putStrLn $ formatMap $ cube x
-        putStrLn $ "Thread " <> show n <> " found solution " 
+        putStrLn $ "Thread " <> show n <> " found solution "
                 <> show i <> " in " <> show (realToFrac
                 (diffUTCTime endTime startTime) :: Double) <> " seconds."
         putStrLn ""
@@ -69,7 +69,7 @@ printSolutions n startTime (x:xs) mv mvTh f = do
         putMVar mv (i+1, t, done')
         unless done' $ do
             printSolutions n startTime xs mv mvTh f
-    
+
 
 pickFirsts :: [Shape] -> ([Shape],[Shape]) -> ([Shape],[Shape])
 pickFirsts [] (fs,rs) = (fs,rs)
@@ -108,8 +108,8 @@ main = do
             startTime
             mv
             mvTh
-            (const False) 
-            -- (>=20) 
+            (const False)
+            -- (>=20)
 
     _ <- takeMVar mvTh
 
