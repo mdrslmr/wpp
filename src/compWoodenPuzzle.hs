@@ -1,3 +1,5 @@
+module Main where
+
 import Data.List (sort, nub)
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, (!*!), (!*))

@@ -103,8 +103,7 @@ main = do
     mvTh <- newMVar False
     _ <- takeMVar mvTh
     findAllParallel 1
-            (pickFirsts
-            staticPieces2 ([],[]))
+            (pickFirsts staticPieces2 ([],[]))
             startTime
             mv
             mvTh

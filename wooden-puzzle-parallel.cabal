@@ -32,3 +32,9 @@ executable comp
     main-is:          compWoodenPuzzle.hs
     ghc-options:        -Wall -threaded -with-rtsopts=-N
 
+executable static-pieces
+    import:           configs
+    other-modules:    WPmodule, StaticPieces
+    main-is:          StaticPiecesMain.hs
+    ghc-options:        -Wall
+

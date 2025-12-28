@@ -12,7 +12,8 @@ module WPmodule (
     Shape,
     candidateRotations,
     allSolutionsSmart,
-    allValidPieces
+    allValidPieces,
+    emptyBox
 ) where
 
 import Linear.V3 (V3(V3))
