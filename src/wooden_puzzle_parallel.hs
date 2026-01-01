@@ -7,6 +7,7 @@ import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar)
 import WPmodule ( Shape, allSolutionsSmart)
 import Control.Monad (when, unless)
 import StaticPieces (staticPieces2)
+import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
 
 {-
  - Assigning symbols to the pieces parts:
@@ -96,6 +97,7 @@ findAllParallel n (f:fs,as) startTime mv mvTh g = do
 
 main :: IO ()
 main = do
+    hSetBuffering stdout LineBuffering
 
     startTime <- getCurrentTime
 
