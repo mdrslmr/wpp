@@ -84,20 +84,38 @@ allValidPieces = fmap dispositionCoordinates allValidDispositions
 emptyBox :: Shape
 emptyBox = [V3 x y z | x <- [1..5], y <- [1..5], z <- [1..5]]
 
+-- check if all voxels have at least one other neighboring free voxel
+check :: Shape -> Bool
+check [] = True
+check ((V3 x y z):vs) = (x>1 && elem (V3 (x-1) y z ) vs) ||
+                        (x<5 && elem (V3 (x+1) y z ) vs) ||
+                        (y>1 && elem (V3 x (y-1) z ) vs) ||
+                        (y<5 && elem (V3 x (y+1) z ) vs) ||
+                        (z>1 && elem (V3 x y (z-1) ) vs) ||
+                        (z<5 && elem (V3 x y (z+1) ) vs)
+
+-- filter pieces containing a given voxel and producing boxes where
+-- check succeeds
+pfltr :: V3 Int -> Shape -> [Shape] -> [(Shape, Shape)]
+pfltr _ _ [] = []
+pfltr f box (p:ps) | f `elem` p && check box' = (p,box') : pfltr f box ps
+                   | otherwise = pfltr f box ps
+                         -- remove voxels contained in piece
+                         -- (Knuth's Algotizhm X)
+                         where box' = fltrMax (`notElem` p) 5 box
+
 subsolutionsSmart :: [Shape] -- candidates
-                  -> Int   -- ^ How many pieces should be in the subsolution we're looking for?
+                  -> Int   -- ^ number of remaining subsolutions
                   -> Shape -- ^ box
                   -> [[Shape]]
 subsolutionsSmart _ 0 _ = [[]]
 subsolutionsSmart _ _ [] = [[]]
 subsolutionsSmart as n (freeVoxel:box) = do
-  newPiece <- filter (elem freeVoxel) as
+  (newPiece,box') <- pfltr freeVoxel box as
 
   -- remove pieces having voxels in common with the newPiece
   -- the idea is taken from Knuth's Algorithm X
-  let as' = filter (not.any (`elem` newPiece)) as
-  let box' = fltrMax (`notElem` newPiece) 5 box
-
+  let as' = filter (not.any (`elem` newPiece))  as
   otherPieces <- subsolutionsSmart as' (n - 1) box'
   return $ newPiece : otherPieces
 
