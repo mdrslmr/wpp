@@ -85,20 +85,27 @@ emptyBox :: Shape
 emptyBox = [V3 x y z | x <- [1..5], y <- [1..5], z <- [1..5]]
 
 -- check if all voxels have at least one other neighboring free voxel
-check :: Shape -> Bool
-check [] = True
-check ((V3 x y z):vs) = (x>1 && elem (V3 (x-1) y z ) vs) ||
-                        (x<5 && elem (V3 (x+1) y z ) vs) ||
-                        (y>1 && elem (V3 x (y-1) z ) vs) ||
-                        (y<5 && elem (V3 x (y+1) z ) vs) ||
-                        (z>1 && elem (V3 x y (z-1) ) vs) ||
-                        (z<5 && elem (V3 x y (z+1) ) vs)
+
+checkAll :: Shape -> Bool
+checkAll vs = go vs vs
+    where
+      go [] _ = True
+      go (v:vs') bs = check v bs && go vs' bs
+
+check :: V3 Int -> Shape -> Bool
+check _ [] = True
+check (V3 x y z) vs = (x>1 && elem (V3 (x-1) y z ) vs) ||
+                      (x<5 && elem (V3 (x+1) y z ) vs) ||
+                      (y>1 && elem (V3 x (y-1) z ) vs) ||
+                      (y<5 && elem (V3 x (y+1) z ) vs) ||
+                      (z>1 && elem (V3 x y (z-1) ) vs) ||
+                      (z<5 && elem (V3 x y (z+1) ) vs)
 
 -- filter pieces containing a given voxel and producing boxes where
 -- check succeeds
 pfltr :: V3 Int -> Shape -> [Shape] -> [(Shape, Shape)]
 pfltr _ _ [] = []
-pfltr f box (p:ps) | f `elem` p && check box' = (p,box') : pfltr f box ps
+pfltr f box (p:ps) | f `elem` p && checkAll box' = (p,box') : pfltr f box ps
                    | otherwise = pfltr f box ps
                          -- remove voxels contained in piece
                          -- (Knuth's Algotizhm X)
