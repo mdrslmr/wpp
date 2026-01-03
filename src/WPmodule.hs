@@ -95,7 +95,7 @@ subsolutionsSmart as n (freeVoxel:box) = do
 
   -- remove pieces having voxels in common with the newPiece
   -- the idea is taken from Knuth's Algorithm X
-  let as' = fltrMax (not.any (`elem` newPiece)) 228 as
+  let as' = filter (not.any (`elem` newPiece)) as
   let box' = fltrMax (`notElem` newPiece) 5 box
 
   otherPieces <- subsolutionsSmart as' (n - 1) box'
