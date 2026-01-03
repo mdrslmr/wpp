@@ -76,6 +76,12 @@ pickFirsts :: [Shape] -> ([Shape],[Shape]) -> ([Shape],[Shape])
 pickFirsts [] (fs,rs) = (fs,rs)
 pickFirsts (a:as) (fs,rs) | V3 1 1 1 `elem` a = pickFirsts as (a:fs,rs)
                           | otherwise = pickFirsts as (fs,a:rs)
+-- helper used to calculate number conflicting pieces with one
+-- piece containg the middle piece -> 228
+--conf :: [Shape] -> ([Shape],[Shape]) -> ([Shape],[Shape])
+--conf [] (fs,rs) = (fs,rs)
+--conf (a:as) (fs,rs) | any (`elem` [V3 1 3 3, V3 2 3 3, V3 3 3 3, V3 4 3 3, V3 3 2 3]) a = conf as (a:fs,rs)
+--                          | otherwise = conf as (fs,a:rs)
 
 findAllParallel :: Int ->  ([Shape], [Shape]) -> UTCTime ->
                     MVar (Int, Int, Bool) -> MVar Bool -> (Int -> Bool) -> IO ()

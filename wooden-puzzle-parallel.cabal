@@ -18,23 +18,23 @@ common configs
 
 library
     import:              configs
-    exposed-modules:     WPmodule, StaticPieces
+    exposed-modules:     WPmodule, StaticPieces, Fltr
 
 executable wooden-puzzle-parallel
     import:           configs
-    other-modules:    WPmodule, StaticPieces
+    other-modules:    WPmodule, StaticPieces, Fltr
     main-is:          wooden_puzzle_parallel.hs
     ghc-options:        -Wall -O2 -threaded -with-rtsopts=-N
 
 executable comp
     import:           configs
-    other-modules:    WPmodule, StaticPieces
+    other-modules:    WPmodule, StaticPieces, Fltr
     main-is:          compWoodenPuzzle.hs
     ghc-options:        -Wall -threaded -with-rtsopts=-N
 
 executable static-pieces
     import:           configs
-    other-modules:    WPmodule, StaticPieces
+    other-modules:    WPmodule, StaticPieces, Fltr
     main-is:          StaticPiecesMain.hs
     ghc-options:        -Wall
 

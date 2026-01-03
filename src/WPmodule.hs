@@ -18,6 +18,7 @@ module WPmodule (
 
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, det33, (!*!), (!*))
+import Fltr (fltrMax)
 
 type Shape = [V3 Int]
 
@@ -94,8 +95,8 @@ subsolutionsSmart as n (freeVoxel:box) = do
 
   -- remove pieces having voxels in common with the newPiece
   -- the idea is taken from Knuth's Algorithm X
-  let as' = filter (not.any (`elem` newPiece))  as
-  let box' = filter (`notElem` newPiece) box
+  let as' = fltrMax (not.any (`elem` newPiece)) 228 as
+  let box' = fltrMax (`notElem` newPiece) 5 box
 
   otherPieces <- subsolutionsSmart as' (n - 1) box'
   return $ newPiece : otherPieces
