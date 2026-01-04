@@ -56,8 +56,9 @@ candidateTranslations = [ V3 x y z | x <- [1..5], y <- [1..5], z <- [1..5] ]
 
 candidateDispositions :: [Disposition]
 candidateDispositions =
-  [ Disposition rot trans | rot   <- candidateRotations
-                          , trans <- candidateTranslations ]
+  [ Disposition { rotation=rot, translation=trans } |
+                                            rot   <- candidateRotations,
+                                            trans <- candidateTranslations ]
 
 -- | Does the given matrix encode a rotation?
 isRotation :: M33 Int -> Bool
@@ -106,7 +107,8 @@ check (V3 x y z) vs = (x>1 && elem (V3 (x-1) y z ) vs) ||
 -- check succeeds
 pfltr :: V3 Int -> Shape -> [Shape] -> [(Shape, Shape)]
 pfltr _ _ [] = []
-pfltr f box (p:ps) | f `elem` p && checkSome 7 box' = (p,box') : pfltr f box ps
+pfltr f box (p:ps) | f `elem` p && checkSome 7 box' =
+                                    (p,box') : pfltr f box ps
                    | otherwise = pfltr f box ps
                          -- remove voxels contained in piece
                          -- (Knuth's Algotizhm X)

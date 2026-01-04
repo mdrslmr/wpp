@@ -43,15 +43,18 @@ formatLines i ((_,s):xs) = show s ++ sep ++ formatLines (i+1) xs
 formatLines _ [] = "\n"
 
 
-printSolutions :: Int -> UTCTime -> [[Shape]] -> MVar (Int, Int, Bool)
-                                -> MVar Bool
-                                -> (Int -> Bool)
-                                -> IO ()
+printSolutions :: Int -- thread number
+                -> UTCTime -- starting time
+                -> [[Shape]] -- solutions
+                -> MVar (Int, Int, Bool) -- synchronize printing
+                -> MVar () -- communicate end of run from thread to main
+                -> (Int -> Bool) -- condition for ending run
+                -> IO ()
 printSolutions n _ [] mv mvTh f = do
     (i,t, _) <- takeMVar mv
     putStrLn $ "Thread " <> show n <> " done."
     let done = t==1 || f i
-    when done  $ putMVar mvTh True
+    when done  $ putMVar mvTh ()
     putMVar mv (i, t-1, done)
     return ()
 printSolutions n startTime (x:xs) mv mvTh f = do
@@ -66,7 +69,7 @@ printSolutions n startTime (x:xs) mv mvTh f = do
                 (diffUTCTime endTime startTime) :: Double) <> " seconds."
         putStrLn ""
         let done' = f i
-        when done' $ putMVar mvTh True
+        when done' $ putMVar mvTh ()
         putMVar mv (i+1, t, done')
         unless done' $ do
             printSolutions n startTime xs mv mvTh f
@@ -78,7 +81,7 @@ pickFirsts (a:as) (fs,rs) | V3 1 1 1 `elem` a = pickFirsts as (a:fs,rs)
                           | otherwise = pickFirsts as (fs,a:rs)
 
 findAllParallel :: Int ->  ([Shape], [Shape]) -> UTCTime ->
-                    MVar (Int, Int, Bool) -> MVar Bool -> (Int -> Bool) -> IO ()
+                    MVar (Int, Int, Bool) -> MVar () -> (Int -> Bool) -> IO ()
 findAllParallel _ ([], _) _ _ _  _ = return ()
 findAllParallel n (f:fs,as) startTime mv mvTh g = do
     putStrLn $ "start thread: " <> show n
@@ -102,7 +105,7 @@ main = do
     startTime <- getCurrentTime
 
     mv <- newMVar (1,0,False)
-    mvTh <- newMVar False
+    mvTh <- newMVar ()
     _ <- takeMVar mvTh
     findAllParallel 1
             (pickFirsts staticPieces2 ([],[]))
