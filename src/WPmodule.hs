@@ -105,14 +105,14 @@ check (V3 x y z) vs = (x>1 && elem (V3 (x-1) y z ) vs) ||
 
 -- filter pieces containing a given voxel and producing boxes where
 -- check succeeds
-pfltr :: V3 Int -> Shape -> [Shape] -> [(Shape, Shape)]
+pfltr :: V3 Int -> Shape -> [Shape] -> [(Shape, Shape, Shape)]
 pfltr _ _ [] = []
 pfltr f box (p:ps) | f `elem` p && checkSome 7 box' =
-                                    (p,box') : pfltr f box ps
+                                    (p, box', bout) : pfltr f box ps
                    | otherwise = pfltr f box ps
                          -- remove voxels contained in piece
                          -- (Knuth's Algotizhm X)
-                         where box' = fltrMax (`notElem` p) 5 box
+                         where (box',bout) = fltrMax (`notElem` p) 5 box
 
 subsolutionsSmart :: [Shape] -- candidates
                   -> Int   -- ^ number of remaining subsolutions
@@ -121,11 +121,11 @@ subsolutionsSmart :: [Shape] -- candidates
 subsolutionsSmart _ 0 _ = [[]]
 subsolutionsSmart _ _ [] = [[]]
 subsolutionsSmart as n (freeVoxel:box) = do
-  (newPiece,box') <- pfltr freeVoxel box as
+  (newPiece,box',bout) <- pfltr freeVoxel box as
 
   -- remove pieces having voxels in common with the newPiece
   -- the idea is taken from Knuth's Algorithm X
-  let as' = filter (not.any (`elem` newPiece))  as
+  let as' = filter (not.any (`elem` (newPiece<>bout)))  as
   otherPieces <- subsolutionsSmart as' (n - 1) box'
   return $ newPiece : otherPieces
 

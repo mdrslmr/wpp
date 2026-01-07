@@ -4,10 +4,11 @@ import Data.Time.Clock (getCurrentTime, diffUTCTime, UTCTime)
 import Linear.V3 (V3(V3))
 import Data.List (sortBy)
 import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar)
-import WPmodule ( Shape, allSolutionsSmart)
+import WPmodule (Shape, allSolutionsSmart)
 import Control.Monad (when, unless)
 import StaticPieces (staticPieces2)
 import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
+import Fltr (fltr)
 
 {-
  - Assigning symbols to the pieces parts:
@@ -76,10 +77,8 @@ printSolutions n startTime (x:xs) mv mvTh f = do
             printSolutions n startTime xs mv mvTh f
 
 
-pickFirsts :: [Shape] -> ([Shape],[Shape]) -> ([Shape],[Shape])
-pickFirsts [] (fs,rs) = (fs,rs)
-pickFirsts (a:as) (fs,rs) | V3 1 1 1 `elem` a = pickFirsts as (a:fs,rs)
-                          | otherwise = pickFirsts as (fs,a:rs)
+pickFirsts :: [Shape] -> ([Shape],[Shape])
+pickFirsts = fltr (V3 1 1 1 `elem`)
 
 findAllParallel :: Int ->  ([Shape], [Shape]) -> UTCTime ->
                     MVar (Int, Int, Bool) -> MVar () -> (Int -> Bool) -> IO ()
@@ -110,7 +109,7 @@ main = do
     mvTh <- newMVar ()
     _ <- takeMVar mvTh
     findAllParallel 0
-            (pickFirsts staticPieces2 ([],[]))
+            (pickFirsts staticPieces2)
             startTime
             mv
             mvTh
