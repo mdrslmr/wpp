@@ -8,7 +8,6 @@ import WPmodule (Shape, allSolutionsSmart)
 import Control.Monad (when, unless)
 import StaticPieces (staticPieces2)
 import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
-import Fltr (fltr)
 
 {-
  - Assigning symbols to the pieces parts:
@@ -77,13 +76,10 @@ printSolutions n startTime (x:xs) mv mvTh f = do
             printSolutions n startTime xs mv mvTh f
 
 
-pickFirsts :: [Shape] -> ([Shape],[Shape])
-pickFirsts = fltr (V3 1 1 1 `elem`)
-
-findAllParallel :: Int ->  ([Shape], [Shape]) -> UTCTime ->
+findAllParallel :: Int -> [Shape] -> [Shape] -> UTCTime ->
                     MVar (Int, Int, Bool) -> MVar () -> (Int -> Bool) -> IO ()
-findAllParallel _ ([], _) _ _ _  _ = return ()
-findAllParallel n (f:fs,as) startTime mv mvTh g = do
+findAllParallel _ [] _ _ _ _  _ = return ()
+findAllParallel n (f:fs) as startTime mv mvTh g = do
     let n' = n+1
     (i,t, done) <- takeMVar mv
     putMVar mv (i,t+1, done)
@@ -94,7 +90,7 @@ findAllParallel n (f:fs,as) startTime mv mvTh g = do
                                  mv
                                  mvTh
                                  g
-    findAllParallel n' (fs,as) startTime mv mvTh g
+    findAllParallel n' fs as startTime mv mvTh g
 
 
 
@@ -109,7 +105,8 @@ main = do
     mvTh <- newMVar ()
     _ <- takeMVar mvTh
     findAllParallel 0
-            (pickFirsts staticPieces2)
+            (filter (V3 1 1 1 `elem`) staticPieces2)
+            (filter (V3 1 1 1 `notElem`) staticPieces2)
             startTime
             mv
             mvTh
