@@ -18,9 +18,8 @@ module WPmodule (
 
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, det33, (!*!), (!*))
-import Fltr (fltrMax)
 
-type Shape = [V3 Int]
+type Shape = [[Int]]
 
 genericPiece :: [V3 Int]
 genericPiece = [ V3 0 0 0, V3 0 0 1, V3 0 0 2, V3 0 0 3, V3 0 1 2 ]
@@ -83,35 +82,14 @@ allValidPieces :: [[V3 Int]]
 allValidPieces = fmap dispositionCoordinates allValidDispositions
 
 emptyBox :: Shape
-emptyBox = [V3 x y z | x <- [1..5], y <- [1..5], z <- [1..5]]
-
--- check if all voxels have at least one other neighboring free voxel
-
-checkSome :: Int -> Shape -> Bool
-checkSome n vs = go n vs vs
-    where
-      go _ [] _ = True
-      go 0 _ _ = True
-      go n' (v:vs') bs = check v bs && go (n'-1) vs' bs
-
-check :: V3 Int -> Shape -> Bool
-check _ [] = True
-check (V3 x y z) vs = (x>1 && elem (V3 (x-1) y z ) vs) ||
-                      (x<5 && elem (V3 (x+1) y z ) vs) ||
-                      (y>1 && elem (V3 x (y-1) z ) vs) ||
-                      (y<5 && elem (V3 x (y+1) z ) vs) ||
-                      (z>1 && elem (V3 x y (z-1) ) vs) ||
-                      (z<5 && elem (V3 x y (z+1) ) vs)
+emptyBox = [[x, y, z] | x <- [1..5], y <- [1..5], z <- [1..5]]
 
 -- filter pieces containing a given voxel and producing boxes where
 -- check succeeds
-pfltr :: V3 Int -> Shape -> [Shape] -> [Shape]
+pfltr :: [Int] -> Shape -> [Shape] -> [Shape]
 pfltr _ _ [] = []
-pfltr f box (p:ps) | f `elem` p && checkSome 7 box' = p : pfltr f box ps
+pfltr f box (p:ps) | f `elem` p = p : pfltr f box ps
                    | otherwise = pfltr f box ps
-                         -- remove voxels contained in piece
-                         -- (Knuth's Algotizhm X)
-                         where box' = fltrMax (`notElem` p) 5 box
 
 subsolutionsSmart :: [Shape] -- candidates
                   -> Int   -- ^ number of remaining subsolutions
