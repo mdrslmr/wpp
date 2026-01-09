@@ -19,6 +19,7 @@ import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
 data Symbol = A | B | C | D | E
     deriving (Show, Eq, Ord)
 
+{-
 type Map = [([Int], Symbol)]
 
 cube :: [Shape] -> Map
@@ -40,7 +41,7 @@ formatLines i ((_,s):xs) = show s ++ sep ++ formatLines (i+1) xs
                       | i `mod`  5 == 0 = "\n"
                       | otherwise = " "
 formatLines _ [] = "\n"
-
+-}
 
 printSolutions :: Int -- thread number
                 -> UTCTime -- starting time
@@ -63,7 +64,7 @@ printSolutions n startTime (x:xs) mv mvTh f = do
         endTime <- getCurrentTime
         print x
         putStrLn ""
-        putStrLn $ formatMap $ cube x
+--        putStrLn $ formatMap $ cube x
         putStrLn $ "Thread " <> show n <> " found solution "
                 <> show i' <> " in " <> show (realToFrac
                 (diffUTCTime endTime startTime) :: Double) <> " seconds."
@@ -104,8 +105,8 @@ main = do
     mvTh <- newMVar ()
     _ <- takeMVar mvTh
     findAllParallel 0
-            (filter ([1, 1, 1] `elem`) staticPieces2List)
-            (filter ([1, 1, 1] `notElem`) staticPieces2List)
+            (filter (1 `elem`) staticPieces2List)
+            (filter (1 `notElem`) staticPieces2List)
             startTime
             mv
             mvTh

@@ -19,7 +19,7 @@ module WPmodule (
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, det33, (!*!), (!*))
 
-type Shape = [[Int]]
+type Shape = [Int]
 
 genericPiece :: [V3 Int]
 genericPiece = [ V3 0 0 0, V3 0 0 1, V3 0 0 2, V3 0 0 3, V3 0 1 2 ]
@@ -82,11 +82,11 @@ allValidPieces :: [[V3 Int]]
 allValidPieces = fmap dispositionCoordinates allValidDispositions
 
 emptyBox :: Shape
-emptyBox = [[x, y, z] | x <- [1..5], y <- [1..5], z <- [1..5]]
+emptyBox = [1..125]
 
 -- filter pieces containing a given voxel and producing boxes where
 -- check succeeds
-pfltr :: [Int] -> Shape -> [Shape] -> [Shape]
+pfltr :: Int -> Shape -> [Shape] -> [Shape]
 pfltr _ _ [] = []
 pfltr f box (p:ps) | f `elem` p = p : pfltr f box ps
                    | otherwise = pfltr f box ps

@@ -14,10 +14,13 @@ sortPieces (b:box) ps = ms ++ sortPieces box ns
 --dosort :: [[V3 Int]]
 --dosort = sortPieces emptyBox (sort allValidPieces)
 
-convV3toList :: V3 Int -> [Int]
-convV3toList (V3 x y z) = [x,y,z]
+v3map = zip [V3 x y z | x <- [1..5], y <- [1..5], z <- [1..5]] [1..]
 
-convV3OieceToV3List :: [V3 Int] -> [[Int]]
+convV3toList :: V3 Int -> Int
+convV3toList v = i
+    where Just i = lookup v v3map 
+
+convV3OieceToV3List :: [V3 Int] -> [Int]
 convV3OieceToV3List [a,b,c,d,e] = [convV3toList a,
                                    convV3toList b,
                                    convV3toList c,
