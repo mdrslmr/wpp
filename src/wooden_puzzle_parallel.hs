@@ -1,11 +1,12 @@
 module Main where
 
 import Data.Time.Clock (getCurrentTime, diffUTCTime, UTCTime)
+import Linear.V3 (V3(V3))
 import Data.List (sortBy)
 import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar)
 import WPmodule (Shape, allSolutionsSmart)
 import Control.Monad (when, unless)
-import StaticPieces (staticPieces2List)
+import StaticPieces (staticPieces2)
 import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
 
 {-
@@ -19,8 +20,7 @@ import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
 data Symbol = A | B | C | D | E
     deriving (Show, Eq, Ord)
 
-{-
-type Map = [([Int], Symbol)]
+type Map = [(V3 Int, Symbol)]
 
 cube :: [Shape] -> Map
 cube = foldl symPiece []
@@ -30,8 +30,8 @@ symPiece m vs = zip vs [A,B,C,D,E] ++ m
 
 formatMap :: Map -> String
 formatMap m = formatLines 1 (sortBy myord m)
-myord  :: ([Int], a) -> ([Int], a) -> Ordering
-myord ([a, b, c], _) ([d, e, f], _) = compare c f `mappend`
+myord  :: (V3 Int, a) -> (V3 Int, a) -> Ordering
+myord (V3 a b c, _) (V3 d e f, _) = compare c f `mappend`
                                     compare b e `mappend`
                                     compare a d
 
@@ -41,7 +41,6 @@ formatLines i ((_,s):xs) = show s ++ sep ++ formatLines (i+1) xs
                       | i `mod`  5 == 0 = "\n"
                       | otherwise = " "
 formatLines _ [] = "\n"
--}
 
 printSolutions :: Int -- thread number
                 -> UTCTime -- starting time
@@ -105,8 +104,8 @@ main = do
     mvTh <- newMVar ()
     _ <- takeMVar mvTh
     findAllParallel 0
-            (filter (1 `elem`) staticPieces2List)
-            (filter (1 `notElem`) staticPieces2List)
+            (filter (1 `elem`) staticPieces2)
+            (filter (1 `notElem`) staticPieces2)
             startTime
             mv
             mvTh

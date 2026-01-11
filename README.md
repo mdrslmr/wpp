@@ -3,9 +3,23 @@
 This software is largely taken from Grégoire Locqueville:
 https://glocq.github.io/en/blog/20250428/
 
+And recently a haskell implementation of Knuth's algorithm X
+has been used:  https://github.com/AlexeyFeigin/algorithm-x .
+This makes the search approximately 1000 times faster than
+the initial algorithm.
+Still the initial setup creation is done with the original code
+and the results are formatted similar as before.
+
 See this thread on mastodon: https://sciences.social/@hn50@social.lansky.name/115239775879997755
 
 ## Source code
+`WPmoduleAx.hs` and `wooden_puzzle_ax.hs` make use of
+https://glocq.github.io/en/blog/20250428/
+In order to use it `cabal.project` has been added,
+the algorithm-x is expected to be placed parallel to this (`wpp`)
+directory named `algorithm.x` and the cabal file had to
+adopted for version bounds, and I renamed to `AlgorithmX.cababl`,
+matching the `name` in the cabal file.
 
 `WPmodule.hs` contains the code from the above link , with a few tiny
 modifications.
