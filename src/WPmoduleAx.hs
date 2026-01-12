@@ -19,7 +19,7 @@ module WPmoduleAx (
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, det33, (!*!), (!*))
 import qualified Data.IntSet as I (IntSet, member, toList, fromList,
-        filter, foldl)
+        filter, foldl, empty)
 
 type IShape = I.IntSet
 
@@ -83,8 +83,8 @@ allValidDispositions = filter isValidDisposition candidateDispositions
 allValidPieces :: [[V3 Int]]
 allValidPieces = fmap dispositionCoordinates allValidDispositions
 
-emptyBox :: [Int]
-emptyBox = [1..125]
+emptyBox :: I.IntSet
+emptyBox = I.fromList [1..125]
 
 iAny :: IShape -> IShape -> Bool
 iAny o p = not (I.foldl  (\b v -> v `I.member` o || b) False p)
@@ -92,19 +92,31 @@ iAny o p = not (I.foldl  (\b v -> v `I.member` o || b) False p)
 
 -- filter pieces containing a given voxel and producing boxes where
 -- check succeeds
-pfltr :: Int -> [Int] -> [IShape] -> [IShape]
-pfltr _ _ [] = []
-pfltr f box (p:ps) | f `I.member` p = p : pfltr f box ps
-                   | otherwise = pfltr f box ps
+pfltr :: Int -> [IShape] -> [IShape]
+pfltr _ [] = []
+pfltr f (p:ps) | f `I.member` p = p : pfltr f ps
+               | otherwise = pfltr f ps
 
 subsolutionsSmart :: [IShape] -- candidates
                   -> Int   -- ^ number of remaining subsolutions
-                  -> [Int] -- ^ box
+                  -> I.IntSet -- ^ box
                   -> [[IShape]]
 subsolutionsSmart _ 0 _ = [[]]
-subsolutionsSmart _ _ [] = [[]]
+subsolutionsSmart as n box 
+    | I.empty == box = [[]]
+    | otherwise =
+    [newPiece:otherPieces | freeVoxel <- I.toList box,
+                newPiece <- pfltr freeVoxel as,
+        let  box' = I.filter (not.(`I.member` newPiece)) box
+             bout = I.filter (`I.member` newPiece) box
+             o = newPiece <> bout
+             as' = filter (iAny o) as :: [IShape],
+        otherPieces <- subsolutionsSmart as' (n - 1) box'
+    ]
+
+{-
 subsolutionsSmart as n (freeVoxel:box) = do
-  newPiece <- pfltr freeVoxel box as
+  newPiece <- pfltr freeVoxel as
 
   -- remove pieces having voxels in common with the newPiece
   -- the idea is taken from Knuth's Algorithm X
@@ -115,6 +127,7 @@ subsolutionsSmart as n (freeVoxel:box) = do
   let as' = filter (iAny o) as :: [IShape]
   otherPieces <- subsolutionsSmart as' (n - 1) (I.toList box')
   return $ newPiece : otherPieces
+-}
 
 allSolutionsSmart :: [IShape] -> [[IShape]]
 allSolutionsSmart as = subsolutionsSmart as 25 emptyBox
