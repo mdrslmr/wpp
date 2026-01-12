@@ -45,3 +45,10 @@ executable wooden-puzzle-ax
     main-is:          wooden_puzzle_ax.hs
     ghc-options:        -Wall -O2 -threaded -with-rtsopts=-N
 
+executable wooden-puzzle-p2
+    import:           configs
+    build-depends:    AlgorithmX
+    other-modules:    WPmoduleAx, StaticPieces, Fltr
+    main-is:          wooden_puzzle_p2.hs
+    ghc-options:        -Wall -O2 -threaded -with-rtsopts=-N
+
