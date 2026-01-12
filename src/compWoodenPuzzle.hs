@@ -1,6 +1,7 @@
 module Main where
 
 import Data.List (sort, nub)
+import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, (!*!), (!*))
 import Text.Regex.TDFA ( AllTextMatches(getAllTextMatches), (=~) )
@@ -114,14 +115,12 @@ findUnique (m:ms) solutions =
 
 main :: IO ()
 main = do
-    --content <- readFile "data/wp-inf.txt"
-    --content <- readFile "data/wp-test.txt"
+    hSetBuffering stdout LineBuffering
     content <- getContents
     let solutions = solsFromContent content
     let sols25 = filter (\s -> length s == 25) solutions
     let nubsols = nub (map sort sols25)
 
-    putStrLn "all orthos:"
 {-
     printRots allOrthos nubsols 0
     putStrLn $ "    found in " <> show (length allOrthos) <>
@@ -130,8 +129,6 @@ main = do
     putStrLn $ "orig length: " <> show (length solutions)
     putStrLn $ "solutions with length 25: " <> show (length sols25)
     putStrLn $ "nub length: " <> show (length nubsols)
-    putStrLn $ "twins found: " <> show ( length $ twins nubsols 1)
-    putStrLn $ "btb found: " <> show ( length $ btb nubsols 1)
     let unique = findUnique allOrthos nubsols
     putStrLn $ "number of unique solutions: " <> show (length unique)
 

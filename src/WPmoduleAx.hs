@@ -18,8 +18,8 @@ module WPmoduleAx (
 
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, det33, (!*!), (!*))
-import qualified Data.IntSet as I (IntSet, member, toList, fromList)
-import AlgorithmX
+import qualified Data.IntSet as I (IntSet, member, toList, fromList,
+        filter, foldl)
 
 type IShape = I.IntSet
 
@@ -86,6 +86,8 @@ allValidPieces = fmap dispositionCoordinates allValidDispositions
 emptyBox :: [Int]
 emptyBox = [1..125]
 
+iAny :: IShape -> IShape -> Bool
+iAny o p = not (I.foldl  (\b v -> v `I.member` o || b) False p)
 
 
 -- filter pieces containing a given voxel and producing boxes where
@@ -106,11 +108,12 @@ subsolutionsSmart as n (freeVoxel:box) = do
 
   -- remove pieces having voxels in common with the newPiece
   -- the idea is taken from Knuth's Algorithm X
-  let box' = filter (not.(`I.member` newPiece)) box
-  let bout = filter (`I.member` newPiece) box
-  let o = I.toList $ newPiece <> I.fromList bout
-  let as' = filter ((not . any (`elem` o)) . I.toList ) as :: [IShape]
-  otherPieces <- subsolutionsSmart as' (n - 1) box'
+  let iBox = I.fromList box
+  let box' = I.filter (not.(`I.member` newPiece)) iBox
+  let bout = I.filter (`I.member` newPiece) iBox
+  let o = newPiece <> bout
+  let as' = filter (iAny o) as :: [IShape]
+  otherPieces <- subsolutionsSmart as' (n - 1) (I.toList box')
   return $ newPiece : otherPieces
 
 allSolutionsSmart :: [IShape] -> [[IShape]]
