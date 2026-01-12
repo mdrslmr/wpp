@@ -130,6 +130,8 @@ main = do
     putStrLn $ "solutions with length 25: " <> show (length sols25)
     putStrLn $ "nub length: " <> show (length nubsols)
     let unique = findUnique allOrthos nubsols
+    putStrLn "last unique:"
+    print $ last unique
     putStrLn $ "number of unique solutions: " <> show (length unique)
 
 
