@@ -93,25 +93,24 @@ printRots (m:ms) solutions t = do
     print sols
     printRots ms solutions (t+ti)
 
-nonDoublets :: [Shape] -> [[Shape]] -> [[Shape]]
-nonDoublets _ [] = []
-nonDoublets c (a:as) | doublet c a = rest
-                     | otherwise = a : rest
-    where doublet :: [Shape] -> [Shape] -> Bool
-          doublet x y |  x == sort y  = True
-                      |     otherwise = False
-          rest = nonDoublets c as
+doublet :: [Shape] -> [Shape] -> Bool
+doublet x y  =  x == sort y
 
-nonSimilars :: (V3 Int -> V3 Int) -> [[Shape]] -> [[Shape]]
+nonDoublets :: [[Shape]] -> [Shape] -> [[Shape]]
+nonDoublets cs c = filter (not.doublet c) cs
+
+appRot :: M33 Int -> [Shape] -> [Shape]
+appRot r s = sort (map (rotShape (mRot r)) s)
+
+nonSimilars :: M33 Int -> [[Shape]] -> [[Shape]]
 nonSimilars _ [] = []
-nonSimilars f (a:as) = a : nonSimilars f
-                        (nonDoublets (sort (map (rotShape f) a)) as)
+nonSimilars m (a:as) = a : nonSimilars m (nonDoublets as (appRot m a))
 
 
 findUnique :: [M33 Int] -> [[Shape]] -> [[Shape]]
 findUnique [] us = us
 findUnique (m:ms) solutions =
-    findUnique ms (nonSimilars (mRot m) solutions)
+    findUnique ms (nonSimilars m solutions)
 
 main :: IO ()
 main = do
