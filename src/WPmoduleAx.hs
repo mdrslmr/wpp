@@ -20,6 +20,7 @@ import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, det33, (!*!), (!*))
 import qualified Data.IntSet as I (IntSet, member, toList, fromList,
         filter, foldl, empty)
+import qualified Data.Set as S (toList, Set, filter)
 
 type IShape = I.IntSet
 
@@ -90,14 +91,7 @@ iAny :: IShape -> IShape -> Bool
 iAny o p = not (I.foldl  (\b v -> v `I.member` o || b) False p)
 
 
--- filter pieces containing a given voxel and producing boxes where
--- check succeeds
-pfltr :: Int -> [IShape] -> [IShape]
-pfltr _ [] = []
-pfltr f (p:ps) | f `I.member` p = p : pfltr f ps
-               | otherwise = pfltr f ps
-
-subsolutionsSmart :: [IShape] -- candidates
+subsolutionsSmart :: S.Set IShape -- candidates
                   -> Int   -- ^ number of remaining subsolutions
                   -> I.IntSet -- ^ box
                   -> [[IShape]]
@@ -105,13 +99,13 @@ subsolutionsSmart _ 0 _ = [[]]
 subsolutionsSmart as n box 
     | I.empty == box = [[]]
     | otherwise =
-    [newPiece:otherPieces | freeVoxel <- I.toList box,
-                newPiece <- pfltr freeVoxel as,
-        let  box' = I.filter (not.(`I.member` newPiece)) box
-             bout = I.filter (`I.member` newPiece) box
-             o = newPiece <> bout
-             as' = filter (iAny o) as :: [IShape],
-        otherPieces <- subsolutionsSmart as' (n - 1) box'
+    [newPiece:otherPieces | let freeVoxel = head $ I.toList box,
+                newPiece <- S.toList (S.filter (I.member freeVoxel)  as),
+                let  box' = I.filter (not.(`I.member` newPiece)) box
+                     bout = I.filter (`I.member` newPiece) box
+                     o = newPiece <> bout
+                     as' = S.filter (iAny o) as,
+                otherPieces <- subsolutionsSmart as' (n - 1) box'
     ]
 
 {-
@@ -129,6 +123,6 @@ subsolutionsSmart as n (freeVoxel:box) = do
   return $ newPiece : otherPieces
 -}
 
-allSolutionsSmart :: [IShape] -> [[IShape]]
+allSolutionsSmart :: S.Set IShape -> [[IShape]]
 allSolutionsSmart as = subsolutionsSmart as 25 emptyBox
 

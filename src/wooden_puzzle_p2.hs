@@ -8,7 +8,7 @@ import Control.Monad (when, unless)
 import StaticPieces (staticPieces2List, staticPieces2)
 import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
 import qualified Data.IntSet as I (member, notMember, fromList, Key)
-import qualified Data.IntMap as IM (fromList) 
+import qualified Data.Set as S  (fromList)
 import Linear.V3 (V3(V3))
 import Data.Maybe (fromMaybe)
 
@@ -97,9 +97,10 @@ findAllParallel n (f:fs) as startTime mv mvTh g = do
     (i,t, done) <- takeMVar mv
     putMVar mv (i,t+1, done)
     putStrLn $ "start thread: " <> show n'
+    let nas = S.fromList (f:as)
     _ <- forkIO $ printSolutions n'
                                  startTime
-                                 (allSolutionsSmart  (f:as))
+                                 (allSolutionsSmart  nas)
                                  mv
                                  mvTh
                                  g
