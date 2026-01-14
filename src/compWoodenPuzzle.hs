@@ -107,6 +107,16 @@ nonSimilars :: M33 Int -> [[Shape]] -> [[Shape]]
 nonSimilars _ [] = []
 nonSimilars m (a:as) = a : nonSimilars m (nonDoublets as (appRot m a))
 
+nos :: M33 Int -> [Shape] -> [[Shape]] -> [[Shape]]
+nos m  s cs = nonDoublets cs (appRot m s)
+
+nonSimAnyRot :: [M33 Int] -> [Shape]  -> [[Shape]] -> [[Shape]]
+nonSimAnyRot []     _ cs = cs
+nonSimAnyRot (r:rs) s cs = nonSimAnyRot rs s (nos r s cs)
+
+fu :: [M33 Int] -> [[Shape]] -> [[Shape]]
+fu _ [] = []
+fu rs (s:cs) = s:fu rs (nonSimAnyRot rs s cs)
 
 findUnique :: [M33 Int] -> [[Shape]] -> [[Shape]]
 findUnique [] us = us
@@ -131,7 +141,8 @@ main = do
     putStrLn $ "orig length: " <> show (length solutions)
     putStrLn $ "solutions with length 25: " <> show (length sols25)
     putStrLn $ "nub length: " <> show (length nubsols)
-    let unique = findUnique allOrthos nubsols
+    --let unique = findUnique allOrthos nubsols
+    let unique = fu allOrthos nubsols
     putStrLn "last unique:"
     print $ last unique
     putStrLn $ "number of unique solutions: " <> show (length unique)
