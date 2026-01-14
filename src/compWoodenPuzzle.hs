@@ -1,5 +1,6 @@
 module Main where
 
+import Data.Time.Clock (getCurrentTime, diffUTCTime)
 import Data.List (sort, nub)
 import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
 import Linear.V3 (V3(V3))
@@ -115,6 +116,8 @@ findUnique (m:ms) solutions =
 main :: IO ()
 main = do
     hSetBuffering stdout LineBuffering
+
+    startTime <- getCurrentTime
     content <- getContents
     let solutions = solsFromContent content
     let sols25 = filter (\s -> length s == 25) solutions
@@ -133,5 +136,8 @@ main = do
     print $ last unique
     putStrLn $ "number of unique solutions: " <> show (length unique)
 
+    endTime <- getCurrentTime
+    putStrLn $ show (realToFrac(diffUTCTime endTime startTime) :: Double) <>
+                    " seconds."
 
 
