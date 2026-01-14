@@ -14,7 +14,7 @@ See this thread on mastodon: https://sciences.social/@hn50@social.lansky.name/11
 
 ## Source code
 `WPmoduleAx.hs` and `wooden_puzzle_ax.hs` make use of
-https://glocq.github.io/en/blog/20250428/
+https://github.com/AlexeyFeigin/algorithm-x
 In order to use it `cabal.project` has been added,
 the algorithm-x is expected to be placed parallel to this (`wpp`)
 directory named `algorithm.x` and the cabal file had to
