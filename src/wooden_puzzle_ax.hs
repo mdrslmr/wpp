@@ -8,7 +8,8 @@ import Control.Monad (when, unless)
 import StaticPieces (staticPieces2List, staticPieces2)
 import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
 import qualified Data.IntSet as I (member, notMember, fromList, Key)
-import qualified Data.IntMap as IM (fromList) 
+import qualified Data.IntMap as IM (fromList, filterWithKey, IntMap, insert,
+                                   toList)
 import Linear.V3 (V3(V3))
 import AlgorithmX (SparseMatrix(SparseMatrix), algoX)
 import Data.Maybe (fromMaybe)
@@ -92,15 +93,16 @@ printSolutions n startTime (x:xs) mv mvTh f = do
             printSolutions n startTime xs mv mvTh f
 
 
-findAllParallel :: Int -> [IShape] -> [IShape] -> UTCTime ->
+findAllParallel :: Int -> [(Int, IShape)] -> IM.IntMap IShape -> 
+                   UTCTime ->
                     MVar (Int, Int, Bool) -> MVar () -> (Int -> Bool) -> IO ()
 findAllParallel _ [] _ _ _ _  _ = return ()
-findAllParallel n (f:fs) as startTime mv mvTh g = do
+findAllParallel n ((k,v):fs) as startTime mv mvTh g = do
     let n' = n+1
     (i,t, done) <- takeMVar mv
     putMVar mv (i,t+1, done)
     putStrLn $ "start thread: " <> show n'
-    let rows1 = IM.fromList $ zip [1..] (f:as)
+    let rows1 = IM.insert k v as
     let m1 = SparseMatrix rows1 (I.fromList [1..125])
     _ <- forkIO $ printSolutions n'
                                  startTime
@@ -117,14 +119,18 @@ main :: IO ()
 main = do
     hSetBuffering stdout LineBuffering
 
+    let allRows = IM.fromList $ zip [1..] (map I.fromList staticPieces2List)
+    let firsts = IM.filterWithKey (\_ v -> 1 `I.member` v) allRows
+    let rest =  IM.filterWithKey (\_ v -> 1 `I.notMember` v) allRows
+
     startTime <- getCurrentTime
 
     mv <- newMVar (0,0,False) -- #solutions, #running threads, run is done
     mvTh <- newMVar ()
     _ <- takeMVar mvTh
     findAllParallel 0
-            (filter (1 `I.member`) (map I.fromList staticPieces2List))
-            (filter (1 `I.notMember`) (map I.fromList staticPieces2List))
+            (IM.toList firsts)
+            rest
             startTime
             mv
             mvTh
