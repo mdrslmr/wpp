@@ -2,7 +2,7 @@ module Main where
 
 import Data.Time.Clock (getCurrentTime, diffUTCTime)
 import Data.List (sort, nub)
-import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
+import System.IO (hSetBuffering, stdout, BufferMode(NoBuffering))
 import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, (!*!), (!*))
 import Text.Regex.TDFA ( AllTextMatches(getAllTextMatches), (=~) )
@@ -73,15 +73,14 @@ rotcomp c (a:as) = go c a  + rotcomp c as
                  |     otherwise = 0
 
 rotShape :: (V3 Int -> V3 Int) -> Shape -> Shape
-rotShape _ [] = []
-rotShape f (a:as) = f a : rotShape f as
+rotShape = map
 
 compSols :: (V3 Int -> V3 Int) -> [[Shape]] -> [Int]
 compSols _ [] = []
 compSols f (a:as) = rotcomp (sort (map (rotShape f) a)) as : compSols f as
 
 mRot :: M33 Int -> V3 Int -> V3 Int
-mRot m v = V3 3 3 3 + m !* (v - V3 3 3 3)
+mRot m v = V3 3 3 3 + (m !* (v - V3 3 3 3))
 
 printRots :: [M33 Int] -> [[Shape]] -> Int -> IO ()
 printRots [] _ t = do putStrLn  $ "total symmetric images: " <> show t
@@ -94,38 +93,38 @@ printRots (m:ms) solutions t = do
     print sols
     printRots ms solutions (t+ti)
 
-doublet :: [Shape] -> [Shape] -> Bool
-doublet x y  =  x == sort y
-
-nonDoublets :: [[Shape]] -> [Shape] -> [[Shape]]
-nonDoublets cs c = filter (not.doublet c) cs
-
 appRot :: M33 Int -> [Shape] -> [Shape]
-appRot r s = sort (map (rotShape (mRot r)) s)
+appRot r s = sort (map (map (mRot r)) s)
 
 nonSimilars :: M33 Int -> [[Shape]] -> [[Shape]]
 nonSimilars _ [] = []
-nonSimilars m (a:as) = a : nonSimilars m (nonDoublets as (appRot m a))
-
-nos :: M33 Int -> [Shape] -> [[Shape]] -> [[Shape]]
-nos m  s cs = nonDoublets cs (appRot m s)
-
-nonSimAnyRot :: [M33 Int] -> [Shape]  -> [[Shape]] -> [[Shape]]
-nonSimAnyRot []     _ cs = cs
-nonSimAnyRot (r:rs) s cs = nonSimAnyRot rs s (nos r s cs)
-
-fu :: [M33 Int] -> [[Shape]] -> [[Shape]]
-fu _ [] = []
-fu rs (s:cs) = s:fu rs (nonSimAnyRot rs s cs)
+nonSimilars m (a:as) = a : nonSimilars m (filter (appRot m a /=) as)
 
 findUnique :: [M33 Int] -> [[Shape]] -> [[Shape]]
 findUnique [] us = us
 findUnique (m:ms) solutions =
     findUnique ms (nonSimilars m solutions)
 
+nonSimAnyRot :: [M33 Int] -> [Shape]  -> [[Shape]] -> [[Shape]]
+nonSimAnyRot []     _ cs = cs
+nonSimAnyRot (r:rs) s cs = nonSimAnyRot rs s (filter (appRot r s /=) cs)
+
+fu :: [M33 Int] -> [[Shape]] -> [[Shape]]
+fu _ [] = []
+fu rs (s:cs) = s:fu rs (nonSimAnyRot rs s cs)
+
+printUs :: [[Shape]] -> Int -> [[Shape]] -> IO ()
+printUs [] n us = do
+    print n
+    print $ head us
+printUs (i:is) n us = do
+    let n' = n+1
+    putStr $ show n' <> " "
+    printUs is n' (i:us)
+
 main :: IO ()
 main = do
-    hSetBuffering stdout LineBuffering
+    hSetBuffering stdout NoBuffering
 
     startTime <- getCurrentTime
     content <- getContents
@@ -144,7 +143,9 @@ main = do
     --let unique = findUnique allOrthos nubsols
     let unique = fu allOrthos nubsols
     putStrLn "last unique:"
-    print $ last unique
+
+    printUs unique 0 []
+
     putStrLn $ "number of unique solutions: " <> show (length unique)
 
     endTime <- getCurrentTime
