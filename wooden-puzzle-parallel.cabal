@@ -18,7 +18,7 @@ common configs
 
 library
     import:              configs
-    exposed-modules:     WPmodule, StaticPieces, Fltr
+    exposed-modules:     WPmodule, StaticPieces, Fltr, WPmap
 
 executable wooden-puzzle-parallel
     import:           configs
@@ -28,7 +28,7 @@ executable wooden-puzzle-parallel
 
 executable comp
     import:           configs
-    other-modules:    WPmodule, StaticPieces, Fltr
+    other-modules:    WPmodule, StaticPieces, Fltr, WPmap
     main-is:          compWoodenPuzzle.hs
     ghc-options:        -Wall -threaded -with-rtsopts=-N
 
@@ -41,7 +41,7 @@ executable static-pieces
 executable wooden-puzzle-ax
     import:           configs
     build-depends:    AlgorithmX
-    other-modules:    WPmoduleAx, StaticPieces, Fltr
+    other-modules:    WPmoduleAx, StaticPieces, Fltr, WPmap
     main-is:          wooden_puzzle_ax.hs
     ghc-options:        -Wall -O2 -threaded -with-rtsopts=-N
 

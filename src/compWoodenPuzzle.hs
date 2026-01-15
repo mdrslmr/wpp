@@ -7,6 +7,8 @@ import Linear.V3 (V3(V3))
 import Linear.Matrix (M33, identity, transpose, (!*!), (!*))
 import Text.Regex.TDFA ( AllTextMatches(getAllTextMatches), (=~) )
 import WPmodule ( candidateRotations, Shape )
+import WPmap (formatMap, cube)
+
 
 pattern :: String
 pattern = "\\[(\\[[V,12345 ]+\\],*)+\\]"
@@ -116,10 +118,14 @@ fu rs (s:cs) = s:fu rs (nonSimAnyRot rs s cs)
 printUs :: [[Shape]] -> Int -> [[Shape]] -> IO ()
 printUs [] n us = do
     print n
-    print $ head us
+    let lst = head us -- in this case, reverted already
+    print lst
+    putStrLn ""
+    putStrLn $ formatMap $ cube lst
+    
 printUs (i:is) n us = do
     let n' = n+1
-    putStr $ show n' <> " "
+--    putStr $ show n' <> " "
     printUs is n' (i:us)
 
 main :: IO ()
