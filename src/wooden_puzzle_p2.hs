@@ -1,60 +1,13 @@
 module Main where
 
 import Data.Time.Clock (getCurrentTime, diffUTCTime, UTCTime)
-import Data.List (sortBy)
 import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar)
 import WPmoduleAx (IShape, allSolutionsSmart)
 import Control.Monad (when, unless)
-import StaticPieces (staticPieces2List, staticPieces2)
+import StaticPieces (staticPieces2List)
 import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
-import qualified Data.IntSet as I (member, notMember, fromList, Key)
+import qualified Data.IntSet as I (member, notMember, fromList)
 import qualified Data.Set as S  (fromList)
-import Linear.V3 (V3(V3))
-import Data.Maybe (fromMaybe)
-
-{-
- - Assigning symbols to the pieces parts:
- -
- -     E
- - A B C D
- -
--}
-
-data Symbol = A | B | C | D | E
-    deriving (Show, Eq, Ord)
-
-type Map = [(V3 Int, Symbol)]
-
-type VShape = [V3 Int]
-
-cube :: [VShape] -> Map
-cube = foldl symPiece []
-
-symPiece :: Map -> VShape -> Map
-symPiece m vs = zip vs [A,B,C,D,E] ++ m
-
-formatMap :: Map -> String
-formatMap m = formatLines 1 (sortBy myord m)
-myord  :: (V3 Int, a) -> (V3 Int, a) -> Ordering
-myord (V3 a b c, _) (V3 d e f, _) = compare c f `mappend`
-                                    compare b e `mappend`
-                                    compare a d
-
-formatLines :: Int -> Map -> String
-formatLines i ((_,s):xs) = show s ++ sep ++ formatLines (i+1) xs
-            where sep | i `mod` 25 == 0 = "\n\n"
-                      | i `mod`  5 == 0 = "\n"
-                      | otherwise = " "
-formatLines _ [] = "\n"
-
-boxMap :: [(Int, [V3 Int])]
-boxMap = zip [1..] staticPieces2
-
-conv :: Int -> [V3 Int]
-conv i =  fromMaybe [] (lookup i boxMap)
-
-convItoV :: [I.Key] -> [[V3 Int]]
-convItoV = map conv
 
 printSolutions :: Int -- thread number
                 -> UTCTime -- starting time
@@ -77,7 +30,6 @@ printSolutions n startTime (x:xs) mv mvTh f = do
         endTime <- getCurrentTime
         print x
         putStrLn ""
---        putStrLn $ formatMap $ cube x
         putStrLn $ "Thread " <> show n <> " found solution "
                 <> show i' <> " in " <> show (realToFrac
                 (diffUTCTime endTime startTime) :: Double) <> " seconds."

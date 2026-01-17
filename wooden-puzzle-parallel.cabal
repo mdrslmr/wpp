@@ -22,7 +22,7 @@ library
 
 executable wooden-puzzle-parallel
     import:           configs
-    other-modules:    WPmodule, StaticPieces, Fltr
+    other-modules:    WPmodule, StaticPieces, Fltr, WPmap
     main-is:          wooden_puzzle_parallel.hs
     ghc-options:        -Wall -O2 -threaded -with-rtsopts=-N
 
@@ -48,7 +48,7 @@ executable wooden-puzzle-ax
 executable wooden-puzzle-p2
     import:           configs
     build-depends:    AlgorithmX
-    other-modules:    WPmoduleAx, StaticPieces, Fltr
+    other-modules:    WPmoduleAx, StaticPieces, Fltr, WPmap
     main-is:          wooden_puzzle_p2.hs
     ghc-options:        -Wall -O2 -threaded -with-rtsopts=-N
 

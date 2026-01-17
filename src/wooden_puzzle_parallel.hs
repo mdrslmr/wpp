@@ -1,46 +1,12 @@
 module Main where
 
 import Data.Time.Clock (getCurrentTime, diffUTCTime, UTCTime)
-import Linear.V3 (V3(V3))
-import Data.List (sortBy)
 import Control.Concurrent (forkIO, putMVar, takeMVar, newMVar, MVar)
 import WPmodule (Shape, allSolutionsSmart)
 import Control.Monad (when, unless)
 import StaticPieces (staticPieces2)
 import System.IO (hSetBuffering, stdout, BufferMode(LineBuffering))
-
-{-
- - Assigning symbols to the pieces parts:
- -
- -     E
- - A B C D
- -
--}
-
-data Symbol = A | B | C | D | E
-    deriving (Show, Eq, Ord)
-
-type Map = [(V3 Int, Symbol)]
-
-cube :: [Shape] -> Map
-cube = foldl symPiece []
-
-symPiece :: Map -> Shape -> Map
-symPiece m vs = zip vs [A,B,C,D,E] ++ m
-
-formatMap :: Map -> String
-formatMap m = formatLines 1 (sortBy myord m)
-myord  :: (V3 Int, a) -> (V3 Int, a) -> Ordering
-myord (V3 a b c, _) (V3 d e f, _) = compare c f `mappend`
-                                    compare b e `mappend`
-                                    compare a d
-
-formatLines :: Int -> Map -> String
-formatLines i ((_,s):xs) = show s ++ sep ++ formatLines (i+1) xs
-            where sep | i `mod` 25 == 0 = "\n\n"
-                      | i `mod`  5 == 0 = "\n"
-                      | otherwise = " "
-formatLines _ [] = "\n"
+import WPmap (formatMap, cube)
 
 printSolutions :: Int -- thread number
                 -> UTCTime -- starting time
@@ -63,7 +29,7 @@ printSolutions n startTime (x:xs) mv mvTh f = do
         endTime <- getCurrentTime
         print x
         putStrLn ""
---        putStrLn $ formatMap $ cube x
+        putStrLn $ formatMap $ cube x
         putStrLn $ "Thread " <> show n <> " found solution "
                 <> show i' <> " in " <> show (realToFrac
                 (diffUTCTime endTime startTime) :: Double) <> " seconds."
