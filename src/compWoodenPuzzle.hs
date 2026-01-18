@@ -8,7 +8,8 @@ import Linear.Matrix (M33, identity, transpose, (!*!), (!*))
 import Text.Regex.TDFA ( AllTextMatches(getAllTextMatches), (=~) )
 import WPmodule ( candidateRotations, Shape )
 import WPmap (formatMap, cube)
-
+import qualified Data.IntMap as IM (IntMap, toList)
+import WPstats (stFreq)
 
 pattern :: String
 pattern = "\\[(\\[[V,12345 ]+\\],*)+\\]"
@@ -157,5 +158,14 @@ main = do
     endTime <- getCurrentTime
     putStrLn $ show (realToFrac(diffUTCTime endTime startTime) :: Double) <>
                     " seconds."
+
+    let totFreq = stFreq nubsols :: IM.IntMap Int
+    let uqFreq = stFreq unique :: IM.IntMap Int
+    putStrLn "totFreq: "
+    print $ IM.toList totFreq
+    putStrLn "uqFreq: "
+    print $ IM.toList uqFreq
+
+    print "done"
 
 
