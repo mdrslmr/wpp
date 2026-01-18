@@ -135,7 +135,7 @@ number of unique solutions: 1264
  
 ## Statistics
 The function `stFreq` from module `WPstats` produces a frequency list,
-showing the number of times pieces occurs in the solutions paired with
+showing the number of times pieces occur in the solutions paired with
 the number of how many pieces with this number of occurrences exist.
 
 #### Frequencies for all 60672 solutions:
@@ -144,7 +144,7 @@ totFreq:
 [(352,24),(458,48),(666,24),(700,24),(741,48),(752,48),(824,24),(834,24),(876,24),(986,24),(1060,48),(1072,48),(1130,48),(1157,48),(1159,48),(1190,48),(1213,48),(1218,24),(1394,48),(1546,48),(2657,48),(2731,48),(4667,48),(5445,48)]
 ```
 All pieces are used hundreds of times.
-The second tuple entry gives the number of times a piece appears
+The second tuple entry gives the number of pieces appearing
 with the number given by the first entry.
 The sum of the second tuple entry is 960, which is the number of
 possible pieces (rather orientations of the piece).
