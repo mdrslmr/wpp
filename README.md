@@ -1,16 +1,21 @@
 # wpp
 
-This initial version of this software is largely taken from Grégoire Locqueville:
+A Haskell implementation for packing 25 pentacubes in a 125 voxel cube.
+
+The initial version of this software is largely taken from Grégoire Locqueville:
 https://glocq.github.io/en/blog/20250428/
 
-In version (file names ending in as) a haskell implementation of Knuth's algorithm X
-has been used:  https://github.com/AlexeyFeigin/algorithm-x .
+In the algorithm-x version (file names ending in as) a haskell implementation of
+Knuth's algorithm X has been used:  https://github.com/AlexeyFeigin/algorithm-x .
 This makes the search approximately 1000 times faster than
 the initial algorithm.
 
 Still the initial setup creation is done with the original code.
 
 See this thread on mastodon: https://sciences.social/@hn50@social.lansky.name/115239775879997755
+
+There is also version (p2) that attempts to convert the original version
+to the algorithm-x idea.
 
 ***Note***
 In order to run this software `cabal.project` has been added,
@@ -43,7 +48,7 @@ is used.
 ### Checking the results
 `compWoodenPuzzle.hs` does some basic analysis of the solutions.
 It checks if the solutions would only differ by the order they
-are listed (permutations). This is does not happen. And it counts
+are listed (permutations). Which is not the case. And it counts
 the number of unique solutions, not being symmetric transformations of each other.
 As found elsewhere, in total there are 60672 solutions, which are not just different
 perturbations and 1264 unique solutions.
@@ -63,7 +68,7 @@ in parallel. By chance my laptop has twelve cores, allowing
 to run the threads simultaneously
 (not just by splitting time between thread).
 
-This has also been used in `wooden_puzzle_ax.hs` using algorithm-x.
+This is also used in the algorithm-x version,`wooden_puzzle_ax.hs`.
 
 
 ## The representation as 2d maps
@@ -122,9 +127,9 @@ last unique:
  8.A  14.A   9.E  19.A  24.D
 
  2.D  21.D  21.C  21.B  21.A
- 5.A   5.B   5.C   5.D  25.D
- 6.A  18.E   5.E  25.E  25.C
-18.D  18.C  18.B  18.A  25.B
+ 5.a   5.b   5.c   5.d  25.d
+ 6.a  18.e   5.e  25.e  25.c
+18.d  18.c  18.b  18.a  25.b
  9.A   9.B   9.C   9.D  25.A
 
 
@@ -134,22 +139,25 @@ number of unique solutions: 1264
 ```
  
 ## Statistics
-The function `stFreq` from module `WPstats` produces a frequency list,
-showing the number of times pieces occur in the solutions paired with
-the number of how many pieces with this number of occurrences exist.
+The function `stFreq` from module `WPstats` produces a frequency list
+of tuples, showing for each piece (or transformation) the number of times
+it occurs in the given solutions (first entry).
+Pieces with the same number of occurrences are listed together in one tuple
+with the number of such pieces given in the second entry of the tuple.
 
 #### Frequencies for all 60672 solutions:
 ```
 totFreq: 
 [(352,24),(458,48),(666,24),(700,24),(741,48),(752,48),(824,24),(834,24),(876,24),(986,24),(1060,48),(1072,48),(1130,48),(1157,48),(1159,48),(1190,48),(1213,48),(1218,24),(1394,48),(1546,48),(2657,48),(2731,48),(4667,48),(5445,48)]
 ```
-All pieces are used hundreds of times.
-The second tuple entry gives the number of pieces appearing
-with the number given by the first entry.
-The sum of the second tuple entry is 960, which is the number of
-possible pieces (rather orientations of the piece).
+The sum of the second tuple entry is 960, which equals the number of
+possible pieces (rather orientations of the piece). All pieces
+are used. 
 
+There are 24 different number of occurrences.
 The different number of occurrences appear either 24 or 48 times.
+The smallest number of occurrence is 352, applying to 24 pieces.
+The largest number is 5445, found for 48 pieces.
 
 
 
